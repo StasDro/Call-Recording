@@ -20,10 +20,9 @@ jobs:
         distribution: 'temurin'
 
     - name: Setup Android SDK commandline-tools and install platforms
-      env:
-        ANDROID_SDK_ROOT: ${{ runner.home }}/Android/Sdk
       run: |
         set -e
+        ANDROID_SDK_ROOT="$HOME/Android/Sdk"
         mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
         cd /tmp
         curl -sSf -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
