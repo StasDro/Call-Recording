@@ -27,13 +27,18 @@ jobs:
         cd /tmp
         curl -sSf -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
         unzip -q commandlinetools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools"
-        # move extracted folder to "latest" so sdkmanager path is consistent
         mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest" || true
         export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH"
         yes | sdkmanager --licenses
-        # INSTALL: platform-tools, нужную платформу и build-tools
-        # sync с compileSdk = 35 -> platforms;android-35 и build-tools;35.0.0
+        # синхронизировать с compileSdk = 35
         sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+    - name: Show workspace for debugging
+      run: |
+        echo "PWD: $(pwd)"
+        ls -la
+        echo "Top-level files:"
+        find . -maxdepth 2 -type f -printf '%p\n' || true
 
     - name: Cache Gradle
       uses: actions/cache@v4
@@ -44,11 +49,38 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: ${{ runner.os }}-gradle-
 
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
-
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug --no-daemon
+    - name: Find project dir and run gradlew
+      run: |
+        set -e
+        # Найти директорию, содержащую settings.gradle* или build.gradle*
+        PROJECT_DIR=$(find . -maxdepth 4 -type f \( -name settings.gradle -o -name settings.gradle.kts -o -name build.gradle -o -name build.gradle.kts \) -printf '%h\n' | head -n1 || true)
+        if [ -z "$PROJECT_DIR" ]; then
+          echo "Не найдено settings.gradle* или build.gradle* в репозитории. Список файлов:"
+          ls -la
+          find . -maxdepth 4 -type f -print
+          exit 1
+        fi
+        echo "Gradle project dir: $PROJECT_DIR"
+        # Если gradlew рядом с найденными файлами — используем его
+        if [ -f "$PROJECT_DIR/gradlew" ]; then
+          echo "Using gradlew in $PROJECT_DIR"
+          chmod +x "$PROJECT_DIR/gradlew"
+          cd "$PROJECT_DIR"
+          ./gradlew assembleDebug --no-daemon
+        else
+          # иначе ищем gradlew где-либо и запускаем из его директории
+          GRADLEW_PATH=$(find . -maxdepth 6 -type f -name gradlew | head -n1 || true)
+          if [ -n "$GRADLEW_PATH" ]; then
+            GRADLEW_DIR=$(dirname "$GRADLEW_PATH")
+            echo "Found gradlew at $GRADLEW_PATH, running from $GRADLEW_DIR"
+            chmod +x "$GRADLEW_PATH"
+            cd "$GRADLEW_DIR"
+            ./gradlew assembleDebug --no-daemon
+          else
+            echo "gradlew не найден. Пожалуйста, добавьте gradlew в проект или укажите рабочую директорию."
+            exit 1
+          fi
+        fi
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
@@ -58,4 +90,4 @@ jobs:
 
     - name: Post-build message
       run: |
-        echo "Build finished. Download artifact from the Actions run page."
+        echo "Build finished (если шаги успешны). Скачайте артефакт из страницы Action run."
