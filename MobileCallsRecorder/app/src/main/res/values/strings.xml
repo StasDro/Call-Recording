@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Call Recorder</string>
+
+    <!-- Navigation -->
+    <string name="nav_recordings">Recordings</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Recordings Screen -->
+    <string name="no_recordings">No recordings yet</string>
+    <string name="no_recordings_hint">Recordings will appear here after calls</string>
+    <string name="incoming_call">Incoming</string>
+    <string name="outgoing_call">Outgoing</string>
+    <string name="unknown_number">Unknown</string>
+    <string name="delete">Delete</string>
+    <string name="share">Share</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="auto_record">Auto-record calls</string>
+    <string name="auto_record_desc">Automatically record all incoming and outgoing calls</string>
+    <string name="recording_quality">Recording quality</string>
+    <string name="quality_low">Low (8 kHz, mono)</string>
+    <string name="quality_medium">Medium (16 kHz, mono)</string>
+    <string name="quality_high">High (44.1 kHz, stereo)</string>
+    <string name="storage_location">Storage location</string>
+    <string name="permissions">Permissions</string>
+    <string name="grant_permissions">Grant required permissions</string>
+
+    <!-- Player -->
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="stop">Stop</string>
+
+    <!-- Notifications -->
+    <string name="recording_notification_title">Recording call</string>
+    <string name="recording_notification_text">Call recording in progress</string>
+    <string name="channel_name">Call Recording</string>
+    <string name="channel_description">Notifications for call recording service</string>
+
+    <!-- Permissions -->
+    <string name="permission_phone_title">Phone permission required</string>
+    <string name="permission_phone_message">This app needs phone permission to detect calls</string>
+    <string name="permission_microphone_title">Microphone permission required</string>
+    <string name="permission_microphone_message">This app needs microphone permission to record calls</string>
+    <string name="permission_contacts_title">Contacts permission</string>
+    <string name="permission_contacts_message">This app needs contacts permission to show caller names</string>
+</resources>
