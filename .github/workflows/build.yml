@@ -1,0 +1,61 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK commandline-tools and install platforms
+      run: |
+        set -e
+        ANDROID_SDK_ROOT="$HOME/Android/Sdk"
+        mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+        cd /tmp
+        curl -sSf -o commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+        unzip -q commandlinetools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools"
+        # move extracted folder to "latest" so sdkmanager path is consistent
+        mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest" || true
+        export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH"
+        yes | sdkmanager --licenses
+        # INSTALL: platform-tools, нужную платформу и build-tools
+        # sync с compileSdk = 35 -> platforms;android-35 и build-tools;35.0.0
+        sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+    - name: Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: ${{ runner.os }}-gradle-
+
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --no-daemon
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Post-build message
+      run: |
+        echo "Build finished. Download artifact from the Actions run page."
