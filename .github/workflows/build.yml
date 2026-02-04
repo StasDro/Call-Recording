@@ -32,7 +32,8 @@ jobs:
         mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest" || true
         export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH"
         yes | sdkmanager --licenses
-        # IMPORTANT: adjust platforms; set android-N to your compileSdkVersion (e.g. android-33)
+        # INSTALL: platform-tools, нужную платформу и build-tools
+        # sync с compileSdk = 35 -> platforms;android-35 и build-tools;35.0.0
         sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
     - name: Cache Gradle
