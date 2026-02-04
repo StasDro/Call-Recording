@@ -30,15 +30,14 @@ jobs:
         mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest" || true
         export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH"
         yes | sdkmanager --licenses
-        # синхронизировать с compileSdk = 35
         sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
     - name: Show workspace for debugging
       run: |
         echo "PWD: $(pwd)"
         ls -la
-        echo "Top-level files:"
-        find . -maxdepth 2 -type f -printf '%p\n' || true
+        echo "Top-level files and dirs:"
+        find . -maxdepth 2 -printf '%p\n' || true
 
     - name: Cache Gradle
       uses: actions/cache@v4
@@ -55,38 +54,47 @@ jobs:
         # Найти директорию, содержащую settings.gradle* или build.gradle*
         PROJECT_DIR=$(find . -maxdepth 4 -type f \( -name settings.gradle -o -name settings.gradle.kts -o -name build.gradle -o -name build.gradle.kts \) -printf '%h\n' | head -n1 || true)
         if [ -z "$PROJECT_DIR" ]; then
-          echo "Не найдено settings.gradle* или build.gradle* в репозитории. Список файлов:"
+          echo "Не найдено settings.gradle* или build.gradle* в репозитории. Список файлов для отладки:"
           ls -la
           find . -maxdepth 4 -type f -print
           exit 1
         fi
         echo "Gradle project dir: $PROJECT_DIR"
-        # Если gradlew рядом с найденными файлами — используем его
-        if [ -f "$PROJECT_DIR/gradlew" ]; then
-          echo "Using gradlew in $PROJECT_DIR"
-          chmod +x "$PROJECT_DIR/gradlew"
-          cd "$PROJECT_DIR"
-          ./gradlew assembleDebug --no-daemon
-        else
-          # иначе ищем gradlew где-либо и запускаем из его директории
-          GRADLEW_PATH=$(find . -maxdepth 6 -type f -name gradlew | head -n1 || true)
-          if [ -n "$GRADLEW_PATH" ]; then
-            GRADLEW_DIR=$(dirname "$GRADLEW_PATH")
-            echo "Found gradlew at $GRADLEW_PATH, running from $GRADLEW_DIR"
-            chmod +x "$GRADLEW_PATH"
-            cd "$GRADLEW_DIR"
-            ./gradlew assembleDebug --no-daemon
-          else
-            echo "gradlew не найден. Пожалуйста, добавьте gradlew в проект или укажите рабочую директорию."
-            exit 1
-          fi
+
+        # Найти gradlew (может быть в корне или в другом месте)
+        GRADLEW_PATH=$(find . -maxdepth 6 -type f -name gradlew | head -n1 || true)
+        if [ -z "$GRADLEW_PATH" ]; then
+          echo "gradlew не найден. Убедитесь, что gradlew добавлен в репозиторий."
+          exit 1
         fi
+        # Привести путь к абсолютному, чтобы можно было запускать из другой директории
+        GRADLEW_ABS=$(realpath "$GRADLEW_PATH")
+        echo "Found gradlew at $GRADLEW_ABS"
+
+        chmod +x "$GRADLEW_ABS"
+        # Запускаем gradlew из директории проекта (PROJECT_DIR), используя абсолютный путь к wrapper
+        (cd "$PROJECT_DIR" && "$GRADLEW_ABS" assembleDebug --no-daemon)
+
+    - name: Locate APK and copy to artifacts directory
+      run: |
+        set -e
+        # Ищем первый debug apk в репозитории
+        APK=$(find . -type f -path "*/build/outputs/apk/debug/*-debug.apk" | head -n1 || true)
+        if [ -z "$APK" ]; then
+          echo "APK не найден. Показать дерево build директорий для диагностики:"
+          find . -type d -name outputs -print || true
+          exit 1
+        fi
+        echo "Found APK: $APK"
+        mkdir -p $GITHUB_WORKSPACE/artifacts
+        cp "$APK" $GITHUB_WORKSPACE/artifacts/app-debug.apk
+        ls -la $GITHUB_WORKSPACE/artifacts
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-debug
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: artifacts/app-debug.apk
 
     - name: Post-build message
       run: |
