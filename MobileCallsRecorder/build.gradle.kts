@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    kotlin("kapt")                              // <-- добавлено для Hilt (KAPT)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)                     // <-- оставляем для KSP (Room), если нужен
     alias(libs.plugins.hilt)
