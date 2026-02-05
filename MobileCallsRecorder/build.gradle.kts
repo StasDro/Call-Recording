@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)                     // <-- оставляем для KSP (Room), если нужен
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.kapt) 
 }
 
 android {
