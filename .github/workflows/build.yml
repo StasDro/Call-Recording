@@ -73,12 +73,11 @@ jobs:
 
         chmod +x "$GRADLEW_ABS"
         # Запускаем gradlew из директории проекта (PROJECT_DIR), используя абсолютный путь к wrapper
-        (cd "$PROJECT_DIR" && "$GRADLEW_ABS" assembleDebug --no-daemon)
+        (cd "$PROJECT_DIR" && "$GRADLEW_ABS" assembleDebug --no-daemon --stacktrace --info)
 
     - name: Locate APK and copy to artifacts directory
       run: |
         set -e
-        # Ищем первый debug apk в репозитории
         APK=$(find . -type f -path "*/build/outputs/apk/debug/*-debug.apk" | head -n1 || true)
         if [ -z "$APK" ]; then
           echo "APK не найден. Показать дерево build директорий для диагностики:"
