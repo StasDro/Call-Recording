@@ -74,6 +74,12 @@ class CallRecordingService : Service() {
                 val phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER) ?: ""
                 val callTypeStr = intent.getStringExtra(EXTRA_CALL_TYPE)
                 val callType = if (callTypeStr == "OUTGOING") CallType.OUTGOING else CallType.INCOMING
+
+                // MUST call startForeground immediately on Android 12+
+                // to avoid ForegroundServiceStartNotAllowedException
+                startForeground(NOTIFICATION_ID, createNotification(phoneNumber))
+                Log.d(TAG, "Service started in foreground")
+
                 startRecording(phoneNumber, callType)
             }
             ACTION_STOP_RECORDING -> {
@@ -94,6 +100,7 @@ class CallRecordingService : Service() {
                 val settings = settingsDataStore.settingsFlow.first()
                 if (!settings.autoRecord) {
                     Log.d(TAG, "Auto-record is disabled")
+                    stopSelf()
                     return@launch
                 }
 
@@ -103,11 +110,12 @@ class CallRecordingService : Service() {
                 currentFilePath = createOutputFile()
 
                 withContext(Dispatchers.Main) {
-                    startForeground(NOTIFICATION_ID, createNotification(phoneNumber))
+                    // startForeground is now called in onStartCommand
                     initializeMediaRecorder()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error starting recording", e)
+                stopSelf()
             }
         }
     }

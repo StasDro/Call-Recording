@@ -99,7 +99,15 @@ class CallReceiver : BroadcastReceiver() {
             )
         }
 
-        context.startForegroundService(intent)
+        // Use startService instead of startForegroundService to avoid
+        // ForegroundServiceStartNotAllowedException on Android 12+
+        // Service will call startForeground() internally
+        try {
+            context.startService(intent)
+            Log.d(TAG, "Recording service started")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start recording service", e)
+        }
     }
 
     private fun stopRecording(context: Context) {
