@@ -5,28 +5,78 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Background circle -->
+    <!-- Tape recorder body -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,27c-14.9,0 -27,12.1 -27,27s12.1,27 27,27s27,-12.1 27,-27S68.9,27 54,27zM54,75c-11.6,0 -21,-9.4 -21,-21s9.4,-21 21,-21s21,9.4 21,21S65.6,75 54,75z"/>
+        android:fillColor="#424242"
+        android:pathData="M20,35 L88,35 L88,85 L20,85 Z"/>
 
-    <!-- Recording dot (circle as path) -->
+    <!-- Left reel (outer circle) -->
     <path
-        android:fillColor="#FF5252"
-        android:pathData="M54,46a8,8 0,1 1,0 16a8,8 0,1 1,0 -16z"/>
+        android:fillColor="#666666"
+        android:pathData="M35,54 m-16,0 a16,16 0,1 1,32 0 a16,16 0,1 1,-32 0"/>
 
-    <!-- Phone receiver left -->
+    <!-- Left reel (inner circle) -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M42,45c-1.7,0 -3,1.3 -3,3v6c0,1.7 1.3,3 3,3h3v-12H42z"/>
+        android:fillColor="#999999"
+        android:pathData="M35,54 m-10,0 a10,10 0,1 1,20 0 a10,10 0,1 1,-20 0"/>
 
-    <!-- Phone receiver right -->
+    <!-- Left reel (center hole) -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M63,45h3c1.7,0 3,1.3 3,3v6c0,1.7 -1.3,3 -3,3h-3V45z"/>
+        android:fillColor="#424242"
+        android:pathData="M35,54 m-4,0 a4,4 0,1 1,8 0 a4,4 0,1 1,-8 0"/>
 
-    <!-- Phone arc -->
+    <!-- Right reel (outer circle) -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M45,48c0,-5 4,-9 9,-9s9,4 9,9"/>
+        android:fillColor="#666666"
+        android:pathData="M73,54 m-16,0 a16,16 0,1 1,32 0 a16,16 0,1 1,-32 0"/>
+
+    <!-- Right reel (inner circle) -->
+    <path
+        android:fillColor="#999999"
+        android:pathData="M73,54 m-10,0 a10,10 0,1 1,20 0 a10,10 0,1 1,-20 0"/>
+
+    <!-- Right reel (center hole) -->
+    <path
+        android:fillColor="#424242"
+        android:pathData="M73,54 m-4,0 a4,4 0,1 1,8 0 a4,4 0,1 1,-8 0"/>
+
+    <!-- Tape between reels (upper) -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M45,46 L63,46 L63,48 L45,48 Z"/>
+
+    <!-- Tape between reels (lower) -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M45,60 L63,60 L63,62 L45,62 Z"/>
+
+    <!-- Control buttons -->
+    <!-- Play button -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M40,72 L40,78 L46,75 Z"/>
+
+    <!-- Stop button -->
+    <path
+        android:fillColor="#F44336"
+        android:pathData="M50,72 L56,72 L56,78 L50,78 Z"/>
+
+    <!-- Record button (red circle) -->
+    <path
+        android:fillColor="#FF0000"
+        android:pathData="M65,75 m-3,0 a3,3 0,1 1,6 0 a3,3 0,1 1,-6 0"/>
+
+    <!-- VU meter indicators (decorative) -->
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M24,42 L28,42 L28,44 L24,44 Z"/>
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M30,42 L34,42 L34,44 L30,44 Z"/>
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M74,42 L78,42 L78,44 L74,44 Z"/>
+    <path
+        android:fillColor="#00BCD4"
+        android:pathData="M80,42 L84,42 L84,44 L80,44 Z"/>
 </vector>
