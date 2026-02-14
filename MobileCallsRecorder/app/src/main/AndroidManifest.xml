@@ -57,8 +57,7 @@
         <!-- Call Recording Service -->
         <service
             android:name=".service.CallRecordingService"
-            android:exported="false"
-            android:foregroundServiceType="phoneCall|microphone" />
+            android:exported="false" />
 
         <!-- Call State Receiver -->
         <receiver

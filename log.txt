@@ -1,0 +1,240 @@
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/1f9346b5660212f5b0b3958c0a8afb2f/transformed/lifecycle-viewmodel-release because:
+  Build cache is disabled
+FAILURE: Build failed with an exception.
+* What went wrong:
+A problem was found with the configuration of task ':processDebugMainManifest' (type 'ProcessApplicationManifest').
+  - In plugin 'com.android.internal.version-check' type 'com.android.build.gradle.tasks.ProcessApplicationManifest' property 'mainManifest' specifies file '/home/runner/work/Call-Recording/Call-Recording/MobileCallsRecorder/src/main/AndroidManifest.xml' which doesn't exist.
+    
+    Reason: An input file was expected to be present but it doesn't exist.
+    
+    Possible solutions:
+      1. Make sure the file exists before the task is called.
+      2. Make sure that the task which produces the file is declared as an input.
+    
+    For more information, please refer to https://docs.gradle.org/8.9/userguide/validation_problems.html#input_file_does_not_exist in the Gradle documentation.
+* Try:
+> Run with --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+* Exception is:
+org.gradle.internal.execution.WorkValidationException: A problem was found with the configuration of task ':processDebugMainManifest' (type 'ProcessApplicationManifest').
+  - In plugin 'com.android.internal.version-check' type 'com.android.build.gradle.tasks.ProcessApplicationManifest' property 'mainManifest' specifies file '/home/runner/work/Call-Recording/Call-Recording/MobileCallsRecorder/src/main/AndroidManifest.xml' which doesn't exist.
+    
+    Reason: An input file was expected to be present but it doesn't exist.
+    
+    Possible solutions:
+      1. Make sure the file exists before the task is called.
+      2. Make sure that the task which produces the file is declared as an input.
+    
+    For more information, please refer to https://docs.gradle.org/8.9/userguide/validation_problems.html#input_file_does_not_exist in the Gradle documentation.
+	at org.gradle.internal.execution.WorkValidationException$BuilderWithSummary.build(WorkValidationException.java:137)
+	at org.gradle.internal.execution.WorkValidationException$BuilderWithSummary.get(WorkValidationException.java:119)
+	at org.gradle.internal.execution.steps.ValidateStep.throwValidationException(ValidateStep.java:172)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:97)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:54)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:64)
+	at org.gradle.internal.execution.steps.AbstractCaptureStateBeforeExecutionStep.execute(AbstractCaptureStateBeforeExecutionStep.java:43)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.executeWithNonEmptySources(AbstractSkipEmptyWorkStep.java:125)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:56)
+	at org.gradle.internal.execution.steps.AbstractSkipEmptyWorkStep.execute(AbstractSkipEmptyWorkStep.java:36)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.execute(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:75)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.execute(HandleStaleOutputsStep.java:41)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$execute$0(AssignMutableWorkspaceStep.java:35)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:289)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:31)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.execute(AssignMutableWorkspaceStep.java:22)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:48)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:35)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:61)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:127)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:116)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.LocalTaskNodeExecutor.execute(LocalTaskNodeExecutor.java:42)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:331)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:318)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:314)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:303)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.execution.plan.DefaultPlanExecutor.process(DefaultPlanExecutor.java:111)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.executeWithServices(DefaultTaskExecutionGraph.java:138)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph.execute(DefaultTaskExecutionGraph.java:123)
+	at org.gradle.execution.SelectedTaskExecutionAction.execute(SelectedTaskExecutionAction.java:35)
+	at org.gradle.execution.DryRunBuildExecutionAction.execute(DryRunBuildExecutionAction.java:51)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:54)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor$ExecuteTasks.call(BuildOperationFiringBuildWorkerExecutor.java:43)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:209)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:166)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.execution.BuildOperationFiringBuildWorkerExecutor.execute(BuildOperationFiringBuildWorkerExecutor.java:40)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$executeTasks$10(DefaultBuildLifecycleController.java:313)
+	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:266)
+	at org.gradle.internal.model.StateTransitionController.lambda$tryTransition$8(StateTransitionController.java:177)
+	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:44)
+	at org.gradle.internal.model.StateTransitionController.tryTransition(StateTransitionController.java:177)
+	at org.gradle.internal.build.DefaultBuildLifecycleController.executeTasks(DefaultBuildLifecycleController.java:304)
+	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.runWork(DefaultBuildWorkGraphController.java:220)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:267)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:131)
+	at org.gradle.composite.internal.DefaultBuildController.doRun(DefaultBuildController.java:181)
+	at org.gradle.composite.internal.DefaultBuildController.access$000(DefaultBuildController.java:50)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.lambda$run$0(DefaultBuildController.java:198)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.composite.internal.DefaultBuildController$BuildOpRunnable.run(DefaultBuildController.java:198)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:48)
+BUILD FAILED in 1m 19s
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/2f255b60f7d40086092e3dbc071815b6/transformed/savedstate-ktx-1.2.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/7410db39e756389f23620816c330da68/transformed/savedstate-1.2.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/cd3be47a7ab49e6fec06f5a60ea4c027/transformed/lifecycle-runtime-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/6ed794a228d05e55178ad3a650580815/transformed/lifecycle-livedata-core-2.8.7 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/9c5770054f27c16b31506bfcd9df7bfa/transformed/lifecycle-viewmodel-ktx-2.8.7 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/5173734d1799285136c5ee09fb595a03/transformed/lifecycle-viewmodel-savedstate-2.8.7 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/9e46c6d14378ac751b1a8e3e7c896ac9/transformed/lifecycle-runtime-ktx-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/d39aa73305fecbad02f73461fca74610/transformed/lifecycle-viewmodel-compose-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/aec1b91addd5f38c27a7d12faeb88476/transformed/material-icons-extended-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/f091694d838ccda32cde9523563e9b13/transformed/ui-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/0986b28eb7dcf652ec448bae20de36b9/transformed/ui-tooling-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/6eb30eac77fef44d3b97885468496cac/transformed/material-icons-core-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/40e057f8985b5d8e7a684f17906f9145/transformed/activity-compose-1.9.3 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/3e1be8c50059eee89670b67301f9c4fa/transformed/viewpager-1.0.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/a7be46a8e6611b87791871046553fd6f/transformed/activity-1.9.3 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/17a5c26d0499c73aa2b1f551b42d761d/transformed/activity-ktx-1.9.3 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/ffb028723d417220cebdd01b2e989dce/transformed/customview-1.0.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/fb34d5153b0525e48c14955f26d56c57/transformed/autofill-1.0.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/ab54cfcb5fcc822d8ae0fb884e056a73/transformed/graphics-path-1.0.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/f9389aacdd09a0a02f189183d230eaa9/transformed/core-1.15.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/97f78b5cb2eb36058acb39173d4c46cb/transformed/customview-poolingcontainer-1.0.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/5229bdc1bc8ff713c5a426e0cf260f4f/transformed/room-runtime-2.6.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/024e0c959b5a07e1228e19f34d654ae7/transformed/room-ktx-2.6.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/552c844717dcc8d0193a469111963225/transformed/datastore-core-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/59286b8f72aea6345d9cea6c83776263/transformed/core-ktx-1.15.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/434209f9e075e36c07a0c44549f470d7/transformed/datastore-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/e89b6c6e6a87c3bda27e77e1e224cf3e/transformed/datastore-preferences-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/f0e75b72f47c038c1be1af63042bd3db/transformed/runtime-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/b8a9eb2dba18f39383ee48f0b8c4f355/transformed/sqlite-framework-2.4.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/e4dedaaa62145976e3513835c648a4db/transformed/runtime-saveable-release because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/064634fc7d23962db7539b119aa90641/transformed/sqlite-2.4.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/7b965f2e10aca3dcd288d69507aa8b70/transformed/core-runtime-2.2.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/f64b43dc2aa45862511e203321f43276/transformed/exifinterface-1.3.6 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/07c4e3a5c580f8eab6c1e21cecee2ea6/transformed/interpolator-1.0.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/2f9676bc1b3695be90a00b5462ff2e95/transformed/profileinstaller-1.3.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/e42259915f0a0550ae442e8b12705da3/transformed/startup-runtime-1.1.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/d146f69c717106cfef15aee6e0915812/transformed/tracing-1.2.0 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/8a06603034bf2081bf4f7080c9167acf/transformed/dagger-lint-aar-2.52 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/82c58a3c2f5c24bec3419b4dfa91ca35/transformed/annotation-experimental-1.4.1 because:
+  Build cache is disabled
+  Caching not enabled.
+Caching disabled for AarTransform: /home/runner/.gradle/caches/8.9/transforms/0096b9b8336c05fa72bc2621b665dadb/transformed/versionedparcelable-1.1.1 because:
+  Build cache is disabled
+  Caching not enabled.
+10 actionable tasks: 10 executed
+Error: Process completed with exit code 1.

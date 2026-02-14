@@ -75,10 +75,9 @@ class CallRecordingService : Service() {
                 val callTypeStr = intent.getStringExtra(EXTRA_CALL_TYPE)
                 val callType = if (callTypeStr == "OUTGOING") CallType.OUTGOING else CallType.INCOMING
 
-                // MUST call startForeground immediately on Android 12+
-                // to avoid ForegroundServiceStartNotAllowedException
-                startForeground(NOTIFICATION_ID, createNotification(phoneNumber))
-                Log.d(TAG, "Service started in foreground")
+                // Run as regular background service (no foreground)
+                // Android 16 doesn't allow startForeground() from background context
+                Log.d(TAG, "Service started (background mode)")
 
                 startRecording(phoneNumber, callType)
             }
