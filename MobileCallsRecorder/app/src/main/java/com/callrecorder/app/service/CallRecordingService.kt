@@ -129,10 +129,18 @@ class CallRecordingService : Service() {
             }
 
             mediaRecorder?.apply {
-                // Use VOICE_COMMUNICATION for call recording
-                // Note: On many devices, this may only record the user's voice
-                // Full call recording requires system-level permissions
-                setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+                Log.d(TAG, "Initializing MediaRecorder with VOICE_COMMUNICATION source")
+                Log.d(TAG, "Quality: ${currentQuality.sampleRate}Hz, ${currentQuality.channels}ch, ${currentQuality.bitRate}bps")
+                Log.d(TAG, "Output file: $currentFilePath")
+
+                try {
+                    setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+                    Log.d(TAG, "Audio source set: VOICE_COMMUNICATION")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to set VOICE_COMMUNICATION source", e)
+                    throw e
+                }
+
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
                 setAudioSamplingRate(currentQuality.sampleRate)
@@ -141,13 +149,16 @@ class CallRecordingService : Service() {
                 setOutputFile(currentFilePath)
 
                 try {
+                    Log.d(TAG, "Calling prepare()...")
                     prepare()
+                    Log.d(TAG, "Prepare successful, calling start()...")
                     start()
                     isRecording = true
                     recordingStartTime = System.currentTimeMillis()
-                    Log.d(TAG, "Recording started: $currentFilePath")
+                    Log.d(TAG, "✓ Recording started successfully: $currentFilePath")
                 } catch (e: Exception) {
                     Log.e(TAG, "MediaRecorder prepare/start failed", e)
+                    Log.e(TAG, "Error details: ${e.javaClass.simpleName}: ${e.message}")
                     // Try fallback with MIC source
                     tryFallbackRecording()
                 }
@@ -159,6 +170,7 @@ class CallRecordingService : Service() {
     }
 
     private fun tryFallbackRecording() {
+        Log.w(TAG, "Attempting fallback recording with MIC source")
         try {
             mediaRecorder?.release()
             mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -169,7 +181,7 @@ class CallRecordingService : Service() {
             }
 
             mediaRecorder?.apply {
-                // Fallback to MIC - will only record user's voice
+                Log.d(TAG, "Setting audio source to MIC")
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
@@ -178,14 +190,16 @@ class CallRecordingService : Service() {
                 setAudioEncodingBitRate(currentQuality.bitRate)
                 setOutputFile(currentFilePath)
 
+                Log.d(TAG, "Fallback: calling prepare()...")
                 prepare()
+                Log.d(TAG, "Fallback: calling start()...")
                 start()
                 isRecording = true
                 recordingStartTime = System.currentTimeMillis()
-                Log.d(TAG, "Fallback recording started with MIC source")
+                Log.d(TAG, "✓ Fallback recording started successfully with MIC source")
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Fallback recording also failed", e)
+            Log.e(TAG, "❌ Fallback recording also failed: ${e.javaClass.simpleName}: ${e.message}", e)
             stopSelf()
         }
     }
