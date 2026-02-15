@@ -75,9 +75,26 @@ class CallRecordingService : Service() {
                 val callTypeStr = intent.getStringExtra(EXTRA_CALL_TYPE)
                 val callType = if (callTypeStr == "OUTGOING") CallType.OUTGOING else CallType.INCOMING
 
-                // Run as regular background service (no foreground)
-                // Android 16 doesn't allow startForeground() from background context
-                Log.d(TAG, "Service started (background mode)")
+                // CRITICAL: Call startForeground() immediately (within 5 seconds)
+                // This is required for Android 12+ to allow service start from background
+                try {
+                    val notification = createNotification(phoneNumber)
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        startForeground(
+                            NOTIFICATION_ID,
+                            notification,
+                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
+                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                        )
+                    } else {
+                        startForeground(NOTIFICATION_ID, notification)
+                    }
+                    Log.d(TAG, "Service started in foreground mode")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to start foreground service", e)
+                    stopSelf()
+                    return START_NOT_STICKY
+                }
 
                 startRecording(phoneNumber, callType)
             }
@@ -294,8 +311,8 @@ class CallRecordingService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val contactName = contactsRepository.getContactName(phoneNumber)
-        val displayName = contactName ?: phoneNumber.ifEmpty { getString(R.string.unknown_number) }
+        // Simple notification - contact name will be null initially
+        val displayName = phoneNumber.ifEmpty { getString(R.string.unknown_number) }
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.recording_notification_title))

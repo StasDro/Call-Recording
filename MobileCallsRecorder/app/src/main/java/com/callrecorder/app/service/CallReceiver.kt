@@ -5,18 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager
 import android.util.Log
-import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkManager
-import java.util.UUID
 
 class CallReceiver : BroadcastReceiver() {
 
     companion object {
         private const val TAG = "CallReceiver"
-        private const val WORK_NAME = "call_recording_work"
         private var lastState = TelephonyManager.CALL_STATE_IDLE
         private var isIncoming = false
         private var savedNumber: String? = null
@@ -98,53 +91,36 @@ class CallReceiver : BroadcastReceiver() {
 
     private fun startRecording(context: Context, phoneNumber: String?, isIncoming: Boolean) {
         try {
-            // Use WorkManager to bypass Android 12+ background service restrictions
-            val inputData = Data.Builder()
-                .putString(CallRecordingWorker.KEY_ACTION, CallRecordingWorker.ACTION_START)
-                .putString(CallRecordingWorker.KEY_PHONE_NUMBER, phoneNumber ?: "")
-                .putString(
-                    CallRecordingWorker.KEY_CALL_TYPE,
+            val intent = Intent(context, CallRecordingService::class.java).apply {
+                action = CallRecordingService.ACTION_START_RECORDING
+                putExtra(CallRecordingService.EXTRA_PHONE_NUMBER, phoneNumber ?: "")
+                putExtra(
+                    CallRecordingService.EXTRA_CALL_TYPE,
                     if (isIncoming) "INCOMING" else "OUTGOING"
                 )
-                .build()
+            }
 
-            val workRequest = OneTimeWorkRequestBuilder<CallRecordingWorker>()
-                .setInputData(inputData)
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .build()
-
-            WorkManager.getInstance(context)
-                .enqueueUniqueWork(
-                    WORK_NAME,
-                    ExistingWorkPolicy.REPLACE,
-                    workRequest
-                )
-
-            Log.d(TAG, "Recording work enqueued via WorkManager")
+            // Use startForegroundService and immediately call startForeground() in service
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                context.startForegroundService(intent)
+            } else {
+                context.startService(intent)
+            }
+            Log.d(TAG, "Recording service started via startForegroundService")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to enqueue recording work", e)
+            Log.e(TAG, "Failed to start recording service", e)
         }
     }
 
     private fun stopRecording(context: Context) {
         try {
-            // First, enqueue a stop action to properly finalize the recording
-            val inputData = Data.Builder()
-                .putString(CallRecordingWorker.KEY_ACTION, CallRecordingWorker.ACTION_STOP)
-                .build()
-
-            val stopRequest = OneTimeWorkRequestBuilder<CallRecordingWorker>()
-                .setInputData(inputData)
-                .build()
-
-            WorkManager.getInstance(context).enqueue(stopRequest)
-
-            // Then cancel the ongoing work
-            WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
-
-            Log.d(TAG, "Recording work cancelled via WorkManager")
+            val intent = Intent(context, CallRecordingService::class.java).apply {
+                action = CallRecordingService.ACTION_STOP_RECORDING
+            }
+            context.startService(intent)
+            Log.d(TAG, "Recording service stop requested")
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to stop recording work", e)
+            Log.e(TAG, "Failed to stop recording service", e)
         }
     }
 }
