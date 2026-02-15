@@ -83,8 +83,7 @@ class CallRecordingService : Service() {
                         startForeground(
                             NOTIFICATION_ID,
                             notification,
-                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE or
-                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL
+                            android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE
                         )
                     } else {
                         startForeground(NOTIFICATION_ID, notification)

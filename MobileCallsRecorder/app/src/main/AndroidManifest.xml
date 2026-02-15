@@ -70,7 +70,7 @@
         <service
             android:name=".service.CallRecordingService"
             android:exported="false"
-            android:foregroundServiceType="microphone|phoneCall" />
+            android:foregroundServiceType="microphone" />
 
         <!-- Call State Receiver -->
         <receiver
