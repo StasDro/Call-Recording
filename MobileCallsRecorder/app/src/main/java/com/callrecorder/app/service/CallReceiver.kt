@@ -100,13 +100,9 @@ class CallReceiver : BroadcastReceiver() {
                 )
             }
 
-            // Use startForegroundService and immediately call startForeground() in service
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
-            Log.d(TAG, "Recording service started via startForegroundService")
+            // Use regular startService (not foreground) to avoid Android 16 restrictions
+            context.startService(intent)
+            Log.d(TAG, "Recording service started via startService (background)")
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start recording service", e)
         }
