@@ -129,16 +129,23 @@ class CallRecordingService : Service() {
             }
 
             mediaRecorder?.apply {
-                Log.d(TAG, "Initializing MediaRecorder with VOICE_COMMUNICATION source")
+                Log.d(TAG, "Initializing MediaRecorder with VOICE_CALL source")
                 Log.d(TAG, "Quality: ${currentQuality.sampleRate}Hz, ${currentQuality.channels}ch, ${currentQuality.bitRate}bps")
                 Log.d(TAG, "Output file: $currentFilePath")
 
                 try {
-                    setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
-                    Log.d(TAG, "Audio source set: VOICE_COMMUNICATION")
+                    // VOICE_CALL works better on Samsung for actual call recording
+                    setAudioSource(MediaRecorder.AudioSource.VOICE_CALL)
+                    Log.d(TAG, "Audio source set: VOICE_CALL")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to set VOICE_COMMUNICATION source", e)
-                    throw e
+                    Log.e(TAG, "Failed to set VOICE_CALL source, trying VOICE_COMMUNICATION", e)
+                    try {
+                        setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+                        Log.d(TAG, "Audio source set: VOICE_COMMUNICATION (fallback)")
+                    } catch (e2: Exception) {
+                        Log.e(TAG, "Failed to set VOICE_COMMUNICATION source", e2)
+                        throw e2
+                    }
                 }
 
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
