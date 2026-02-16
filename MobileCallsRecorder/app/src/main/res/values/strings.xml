@@ -38,6 +38,11 @@
     <string name="channel_name">Call Recording</string>
     <string name="channel_description">Notifications for call recording service</string>
 
+    <string name="monitoring_notification_title">Call recording enabled</string>
+    <string name="monitoring_notification_text">Monitoring calls for auto-recording</string>
+    <string name="monitoring_channel_name">Call Monitoring</string>
+    <string name="monitoring_channel_description">Keeps the app active to detect and record calls</string>
+
     <!-- Permissions -->
     <string name="permission_phone_title">Phone permission required</string>
     <string name="permission_phone_message">This app needs phone permission to detect calls</string>
