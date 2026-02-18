@@ -5,11 +5,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.media.AudioManager
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.Environment
 import android.os.IBinder
+import android.provider.CallLog
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.callrecorder.app.MainActivity
@@ -48,7 +51,11 @@ class CallRecordingService : Service() {
     private var recordingStartTime: Long = 0
     private var currentQuality: RecordingQuality = RecordingQuality.MEDIUM
 
+    // Use NonCancellable scope for saving - will not be cancelled on onDestroy
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    private var audioManager: AudioManager? = null
+    private var wasSpeakerOn = false
 
     companion object {
         private const val TAG = "CallRecordingService"
@@ -64,6 +71,7 @@ class CallRecordingService : Service() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -74,11 +82,7 @@ class CallRecordingService : Service() {
                 val phoneNumber = intent.getStringExtra(EXTRA_PHONE_NUMBER) ?: ""
                 val callTypeStr = intent.getStringExtra(EXTRA_CALL_TYPE)
                 val callType = if (callTypeStr == "OUTGOING") CallType.OUTGOING else CallType.INCOMING
-
-                // Run as background service without foreground notification
-                // Android 16 blocks foreground service from background context
                 Log.d(TAG, "Service started in background mode (no foreground)")
-
                 startRecording(phoneNumber, callType)
             }
             ACTION_STOP_RECORDING -> {
@@ -104,18 +108,44 @@ class CallRecordingService : Service() {
                 }
 
                 currentQuality = settings.recordingQuality
-                currentPhoneNumber = phoneNumber
+                currentPhoneNumber = phoneNumber.ifEmpty { null }
                 currentCallType = callType
                 currentFilePath = createOutputFile()
 
                 withContext(Dispatchers.Main) {
-                    // startForeground is now called in onStartCommand
+                    enableSpeakerForRecording()
                     initializeMediaRecorder()
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Error starting recording", e)
                 stopSelf()
             }
+        }
+    }
+
+    // Enable speaker so MIC captures both sides of the call
+    private fun enableSpeakerForRecording() {
+        try {
+            wasSpeakerOn = audioManager?.isSpeakerphoneOn ?: false
+            if (!wasSpeakerOn) {
+                audioManager?.isSpeakerphoneOn = true
+                Log.d(TAG, "Speaker enabled for recording both sides")
+            } else {
+                Log.d(TAG, "Speaker was already on")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to enable speaker", e)
+        }
+    }
+
+    private fun restoreSpeaker() {
+        try {
+            if (!wasSpeakerOn) {
+                audioManager?.isSpeakerphoneOn = false
+                Log.d(TAG, "Speaker restored to original state (off)")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to restore speaker", e)
         }
     }
 
@@ -134,17 +164,17 @@ class CallRecordingService : Service() {
                 Log.d(TAG, "Output file: $currentFilePath")
 
                 try {
-                    // VOICE_CALL works better on Samsung for actual call recording
                     setAudioSource(MediaRecorder.AudioSource.VOICE_CALL)
                     Log.d(TAG, "Audio source set: VOICE_CALL")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to set VOICE_CALL source, trying VOICE_COMMUNICATION", e)
+                    Log.e(TAG, "VOICE_CALL blocked, trying VOICE_COMMUNICATION", e)
                     try {
                         setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
-                        Log.d(TAG, "Audio source set: VOICE_COMMUNICATION (fallback)")
+                        Log.d(TAG, "Audio source set: VOICE_COMMUNICATION")
                     } catch (e2: Exception) {
-                        Log.e(TAG, "Failed to set VOICE_COMMUNICATION source", e2)
-                        throw e2
+                        Log.e(TAG, "VOICE_COMMUNICATION blocked, using MIC", e2)
+                        setAudioSource(MediaRecorder.AudioSource.MIC)
+                        Log.d(TAG, "Audio source set: MIC (speaker is on, will capture both sides)")
                     }
                 }
 
@@ -164,54 +194,19 @@ class CallRecordingService : Service() {
                     recordingStartTime = System.currentTimeMillis()
                     Log.d(TAG, "✓ Recording started successfully: $currentFilePath")
                 } catch (e: Exception) {
-                    Log.e(TAG, "MediaRecorder prepare/start failed", e)
-                    Log.e(TAG, "Error details: ${e.javaClass.simpleName}: ${e.message}")
-                    // Try fallback with MIC source
-                    tryFallbackRecording()
+                    Log.e(TAG, "MediaRecorder start failed: ${e.message}", e)
+                    stopSelf()
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing MediaRecorder", e)
-            tryFallbackRecording()
-        }
-    }
-
-    private fun tryFallbackRecording() {
-        Log.w(TAG, "Attempting fallback recording with MIC source")
-        try {
-            mediaRecorder?.release()
-            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                MediaRecorder(this)
-            } else {
-                @Suppress("DEPRECATION")
-                MediaRecorder()
-            }
-
-            mediaRecorder?.apply {
-                Log.d(TAG, "Setting audio source to MIC")
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                setAudioSamplingRate(currentQuality.sampleRate)
-                setAudioChannels(currentQuality.channels)
-                setAudioEncodingBitRate(currentQuality.bitRate)
-                setOutputFile(currentFilePath)
-
-                Log.d(TAG, "Fallback: calling prepare()...")
-                prepare()
-                Log.d(TAG, "Fallback: calling start()...")
-                start()
-                isRecording = true
-                recordingStartTime = System.currentTimeMillis()
-                Log.d(TAG, "✓ Fallback recording started successfully with MIC source")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Fallback recording also failed: ${e.javaClass.simpleName}: ${e.message}", e)
             stopSelf()
         }
     }
 
     private fun stopRecording() {
+        restoreSpeaker()
+
         if (!isRecording) {
             stopSelf()
             return
@@ -226,39 +221,74 @@ class CallRecordingService : Service() {
             isRecording = false
 
             val duration = System.currentTimeMillis() - recordingStartTime
+            val filePath = currentFilePath ?: ""
+            val callType = currentCallType
+            val startTime = recordingStartTime
+            val quality = currentQuality
+            val phoneNumber = currentPhoneNumber
 
-            // Save recording to database
-            serviceScope.launch {
+            Log.d(TAG, "Recording stopped, duration: ${duration}ms, saving to DB...")
+
+            // Use runBlocking to save BEFORE stopSelf() cancels the scope
+            runBlocking {
                 try {
-                    val file = File(currentFilePath ?: "")
-                    val contactName = currentPhoneNumber?.let {
+                    // Try to get phone number from CallLog if not available
+                    val resolvedNumber = if (phoneNumber.isNullOrEmpty()) {
+                        getLastCallNumber()
+                    } else {
+                        phoneNumber
+                    }
+
+                    val contactName = resolvedNumber?.let {
                         contactsRepository.getContactName(it)
                     }
 
+                    val file = File(filePath)
                     val recording = Recording(
-                        phoneNumber = currentPhoneNumber ?: "Unknown",
+                        phoneNumber = resolvedNumber ?: "Unknown",
                         contactName = contactName,
-                        callType = currentCallType,
-                        startTime = recordingStartTime,
+                        callType = callType,
+                        startTime = startTime,
                         duration = duration,
-                        filePath = currentFilePath ?: "",
+                        filePath = filePath,
                         fileSize = if (file.exists()) file.length() else 0,
-                        quality = currentQuality
+                        quality = quality
                     )
 
                     recordingRepository.insertRecording(recording)
-                    Log.d(TAG, "Recording saved to database: ${recording.id}")
+                    Log.d(TAG, "✓ Recording saved to database. Number: $resolvedNumber, Contact: $contactName")
                 } catch (e: Exception) {
                     Log.e(TAG, "Error saving recording to database", e)
                 }
             }
 
-            Log.d(TAG, "Recording stopped, duration: ${duration}ms")
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping recording", e)
         } finally {
             stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelf()
+        }
+    }
+
+    // Read the last call from CallLog to get phone number
+    private fun getLastCallNumber(): String? {
+        return try {
+            val cursor = contentResolver.query(
+                CallLog.Calls.CONTENT_URI,
+                arrayOf(CallLog.Calls.NUMBER, CallLog.Calls.DATE),
+                null, null,
+                "${CallLog.Calls.DATE} DESC"
+            )
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val number = it.getString(it.getColumnIndexOrThrow(CallLog.Calls.NUMBER))
+                    Log.d(TAG, "Got number from CallLog: $number")
+                    number
+                } else null
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to read CallLog", e)
+            null
         }
     }
 
@@ -295,15 +325,10 @@ class CallRecordingService : Service() {
     private fun createNotification(phoneNumber: String): Notification {
         val intent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
+            this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-
-        // Simple notification - contact name will be null initially
         val displayName = phoneNumber.ifEmpty { getString(R.string.unknown_number) }
-
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.recording_notification_title))
             .setContentText("$displayName - ${getString(R.string.recording_notification_text)}")
@@ -311,7 +336,6 @@ class CallRecordingService : Service() {
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .build()
     }
 
