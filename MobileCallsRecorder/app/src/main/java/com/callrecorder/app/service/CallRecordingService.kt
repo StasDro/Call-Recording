@@ -151,10 +151,9 @@ class CallRecordingService : Service() {
 
     private fun initializeMediaRecorder() {
         try {
-            // Try audio sources in order: VOICE_CALL -> VOICE_COMMUNICATION -> MIC
+            // Samsung blocks VOICE_CALL and VOICE_COMMUNICATION at audio routing level
+            // Use only MIC with speaker auto-enabled to capture both sides
             val audioSources = listOf(
-                MediaRecorder.AudioSource.VOICE_CALL to "VOICE_CALL",
-                MediaRecorder.AudioSource.VOICE_COMMUNICATION to "VOICE_COMMUNICATION",
                 MediaRecorder.AudioSource.MIC to "MIC"
             )
 
