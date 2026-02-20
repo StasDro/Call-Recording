@@ -151,53 +151,71 @@ class CallRecordingService : Service() {
 
     private fun initializeMediaRecorder() {
         try {
-            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                MediaRecorder(this)
-            } else {
-                @Suppress("DEPRECATION")
-                MediaRecorder()
-            }
+            // Try audio sources in order: VOICE_CALL -> VOICE_COMMUNICATION -> MIC
+            val audioSources = listOf(
+                MediaRecorder.AudioSource.VOICE_CALL to "VOICE_CALL",
+                MediaRecorder.AudioSource.VOICE_COMMUNICATION to "VOICE_COMMUNICATION",
+                MediaRecorder.AudioSource.MIC to "MIC"
+            )
 
-            mediaRecorder?.apply {
-                Log.d(TAG, "Initializing MediaRecorder with VOICE_CALL source")
-                Log.d(TAG, "Quality: ${currentQuality.sampleRate}Hz, ${currentQuality.channels}ch, ${currentQuality.bitRate}bps")
-                Log.d(TAG, "Output file: $currentFilePath")
+            var recordingStarted = false
 
+            for ((audioSource, sourceName) in audioSources) {
                 try {
-                    setAudioSource(MediaRecorder.AudioSource.VOICE_CALL)
-                    Log.d(TAG, "Audio source set: VOICE_CALL")
-                } catch (e: Exception) {
-                    Log.e(TAG, "VOICE_CALL blocked, trying VOICE_COMMUNICATION", e)
-                    try {
-                        setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
-                        Log.d(TAG, "Audio source set: VOICE_COMMUNICATION")
-                    } catch (e2: Exception) {
-                        Log.e(TAG, "VOICE_COMMUNICATION blocked, using MIC", e2)
-                        setAudioSource(MediaRecorder.AudioSource.MIC)
-                        Log.d(TAG, "Audio source set: MIC (speaker is on, will capture both sides)")
+                    Log.d(TAG, "Attempting to use audio source: $sourceName")
+
+                    mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        MediaRecorder(this)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        MediaRecorder()
                     }
-                }
 
-                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                setAudioSamplingRate(currentQuality.sampleRate)
-                setAudioChannels(currentQuality.channels)
-                setAudioEncodingBitRate(currentQuality.bitRate)
-                setOutputFile(currentFilePath)
+                    mediaRecorder?.apply {
+                        Log.d(TAG, "Quality: ${currentQuality.sampleRate}Hz, ${currentQuality.channels}ch, ${currentQuality.bitRate}bps")
+                        Log.d(TAG, "Output file: $currentFilePath")
 
-                try {
-                    Log.d(TAG, "Calling prepare()...")
-                    prepare()
-                    Log.d(TAG, "Prepare successful, calling start()...")
-                    start()
-                    isRecording = true
-                    recordingStartTime = System.currentTimeMillis()
-                    Log.d(TAG, "✓ Recording started successfully: $currentFilePath")
+                        setAudioSource(audioSource)
+                        setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                        setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                        setAudioSamplingRate(currentQuality.sampleRate)
+                        setAudioChannels(currentQuality.channels)
+                        setAudioEncodingBitRate(currentQuality.bitRate)
+                        setOutputFile(currentFilePath)
+
+                        Log.d(TAG, "Calling prepare()...")
+                        prepare()
+                        Log.d(TAG, "Calling start()...")
+                        start()
+
+                        isRecording = true
+                        recordingStartTime = System.currentTimeMillis()
+                        Log.d(TAG, "✓ Recording started successfully with $sourceName: $currentFilePath")
+                        recordingStarted = true
+                    }
+
+                    break // Success, exit the loop
+
                 } catch (e: Exception) {
-                    Log.e(TAG, "MediaRecorder start failed: ${e.message}", e)
-                    stopSelf()
+                    Log.e(TAG, "$sourceName failed: ${e.message}", e)
+                    mediaRecorder?.release()
+                    mediaRecorder = null
+
+                    if (sourceName == "MIC") {
+                        // Last option failed, give up
+                        Log.e(TAG, "All audio sources failed, cannot record")
+                        stopSelf()
+                        return
+                    }
+                    // Try next audio source
                 }
             }
+
+            if (!recordingStarted) {
+                Log.e(TAG, "Failed to start recording with any audio source")
+                stopSelf()
+            }
+
         } catch (e: Exception) {
             Log.e(TAG, "Error initializing MediaRecorder", e)
             stopSelf()
